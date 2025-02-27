@@ -19,19 +19,15 @@ define('DYNAMIC_LEAFLET_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('DYNAMIC_LEAFLET_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('DYNAMIC_LEAFLET_PLUGIN_VERSION', '1.0');
 
-function tabbed_admin_enqueue_scripts() {
-    wp_enqueue_script( 'tabbed-admin-script', plugin_dir_url( __FILE__ ) . 'assets/js/setting.js', array( 'jquery' ), '1.0.0', true );
-}
-add_action( 'admin_enqueue_scripts', 'tabbed_admin_enqueue_scripts' );
-
-
-
 // include plugin files
+require_once DYNAMIC_LEAFLET_PLUGIN_PATH . 'includes/styles-and-scripts.php';
 require_once DYNAMIC_LEAFLET_PLUGIN_PATH . 'includes/dynamic-leaflet-post-type.php';
 require_once DYNAMIC_LEAFLET_PLUGIN_PATH . 'includes/secure-custom-fields.php';
 require_once DYNAMIC_LEAFLET_PLUGIN_PATH . 'includes/dynamic-leaflet-custom-fields.php';
 require_once DYNAMIC_LEAFLET_PLUGIN_PATH . 'includes/sort-column.php';
 require_once DYNAMIC_LEAFLET_PLUGIN_PATH . 'includes/setting.php';
+require_once DYNAMIC_LEAFLET_PLUGIN_PATH . 'includes/shortcode.php';
+
 
 //activation hook	
 function dynamic_leaflet_activate(){
