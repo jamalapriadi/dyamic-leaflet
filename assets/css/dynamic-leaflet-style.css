@@ -1,0 +1,21 @@
+.styled-list {
+    list-style-type: none; /* Remove default bullet points */
+    padding: 0;
+    margin: 20px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.styled-list li {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.styled-list li:last-child {
+    border-bottom: none; /* Remove border from the last item */
+}
+
+.styled-list li:hover {
+    background-color: #f0f0f0;
+}

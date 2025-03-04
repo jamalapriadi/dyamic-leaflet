@@ -16,8 +16,12 @@ class DynamicLeafletSettingAdminPage{
         add_action('admin_init', array($this, 'dynamic_leaflet_register_my_settings'));   
     }   
 
+    /**
+     * add scripts and styles for admin page
+     */
     function dynamic_leaflet_enqueue_styles_and_scripts(){
         if (is_user_logged_in() && current_user_can('manage_options') && is_admin()){
+            wp_enqueue_style('dynamic-leaflet-style', DYNAMIC_LEAFLET_PLUGIN_URL . 'assets/css/dynamic-leaflet-style.css', array(), '1.0.0', 'all');
             wp_enqueue_script( 'tabbed-admin-script', DYNAMIC_LEAFLET_PLUGIN_URL . 'assets/js/setting.js', array( 'jquery' ), '1.0.0', true );
 
             wp_localize_script( 'leaflet-custom-js', 'leaflet_data', array(
@@ -28,6 +32,9 @@ class DynamicLeafletSettingAdminPage{
 
     }
 
+    /**
+     * script for custom admin menu
+     */
     function dynamic_leaflet_custom_admin_menu() {
         $post_type = 'dynamic-leaflet'; // Change this to your CPT slug
     
@@ -41,6 +48,9 @@ class DynamicLeafletSettingAdminPage{
         );
     }
 
+    /**
+     * callback function for custom admin menu
+     */
     function dynamic_leaflet_setting_page() {
         if ( ! current_user_can( 'manage_options' ) ) {
             return;
@@ -54,61 +64,156 @@ class DynamicLeafletSettingAdminPage{
             
             <h2 class="nav-tab-wrapper">
                 <a href="#tab-1" class="nav-tab nav-tab-active">Map Settings</a>
-                <a href="#tab-2" class="nav-tab">Filter & Categories</a>
                 <a href="#tab-3" class="nav-tab">Help & Getting Started</a>
             </h2>
     
             <div id="tab-1" class="tab-content">
-                <?php settings_fields('dynamic_leaflet_settings_group_tab_1'); ?>
-                <?php do_settings_sections('tabbed-settings-tab-1'); ?>
-                <?php submit_button(); ?>
-            </div>
-    
-            <div id="tab-2" class="tab-content" style="display: none;">
-                <h3>Tab 2 Content</h3>
-                <p>Settings for Tab 2.</p>
-                <?php settings_fields('dynamic_leaflet_settings_group_tab_2'); ?>
-                <?php do_settings_sections('tabbed-settings-tab-2'); ?>
-                <?php submit_button(); ?>
+                <?php
+                if (isset($_POST['submit_setting_map'])) {
+                    $this->handleForm();
+                }
+                ?>
+                <form method="POST">
+                    <input type="hidden" name="submit_setting_map" value="true">
+
+                    <?php settings_fields('dynamic_leaflet_settings_group_tab_1'); ?>
+                    <?php do_settings_sections('tabbed-settings-tab-1'); ?>
+                    <?php submit_button(); ?>
+                </form>
             </div>
     
             <div id="tab-3" class="tab-content" style="display: none;">
-                <h3>Tab 3 Content</h3>
-                <p>Settings for Tab 3.</p>
-                <?php settings_fields('dynamic_leaflet_settings_group_tab_3'); ?>
-                <?php do_settings_sections('tabbed-settings-tab-3'); ?>
-                <?php submit_button(); ?>
+                <h3>Getting started with Dynamic Leaflet</h3>
+                <ul class="styled-list">
+                    <li>Use the page editor or Elementor to insert the "Dynamic Leaflet" block onto a page. Alternatively, you can use the shortcode [dynamic-leaflet-map]</li>
+                    <li>You can <a href="<?php echo esc_url(admin_url('edit.php?post_type=dynamic-leaflet')); ?>">manage Locations</a> under Dynamic Leaflet > All Locations</li>
+                    <li><a href="<?php echo esc_url(admin_url('edit.php?post_type=dynamic-leaflet&page=setting-dynamic-leaflet')); ?>">Customize</a> styles and features under Dynamic Leaflet > Settings</li>
+                </ul>
             </div>
     
         </div>
         <?php
     }
 
-    function dynamic_leaflet_register_my_settings() {
-        register_setting('dynamic_leaflet_settings_group_tab_1', 'my_tab_1_setting');
-        add_settings_section('my_tab_1_section', 'Tab 1 Settings', '__return_false', 'tabbed-settings-tab-1');
-        add_settings_field('my_tab_1_field', 'Tab 1 Field', array($this,'my_tab_1_field_callback'), 'tabbed-settings-tab-1', 'my_tab_1_section');
-    
-        register_setting('dynamic_leaflet_settings_group_tab_2', 'my_tab_2_setting');
-        add_settings_section('my_tab_2_section', 'Tab 2 Settings', '__return_false', 'tabbed-settings-tab-2');
-        add_settings_field('my_tab_2_field', 'Tab 2 Field', array($this,'my_tab_2_field_callback'), 'tabbed-settings-tab-2', 'my_tab_2_section');
-    
-        register_setting('dynamic_leaflet_settings_group_tab_3', 'my_tab_3_setting');
-        add_settings_section('my_tab_3_section', 'Tab 3 Settings', '__return_false', 'tabbed-settings-tab-3');
-        add_settings_field('my_tab_3_field', 'Tab 3 Field', array($this,'my_tab_3_field_callback'), 'tabbed-settings-tab-3', 'my_tab_3_section');
+    function handleForm() {
+        // Sanitize and validate input
+        if(current_user_can('manage_options')){
+            if ( ! isset( $_POST['leaflet_map_options'] ) ) {
+                return;
+            }
+        }
+
+        $data = array(
+            'latitude' => sanitize_text_field($_POST['leaflet_map_options']['latitude']),
+            'longitude' => sanitize_text_field($_POST['leaflet_map_options']['longitude']),
+            'zoom' => intval($_POST['leaflet_map_options']['zoom']),
+            'height' => sanitize_text_field($_POST['leaflet_map_options']['height']),
+            'width' => sanitize_text_field($_POST['leaflet_map_options']['width']),
+            'tile_url' => sanitize_text_field($_POST['leaflet_map_options']['tile_url']),
+            'attribution' => sanitize_textarea_field($_POST['leaflet_map_options']['attribution']),
+            'maxzoom' => intval($_POST['leaflet_map_options']['maxzoom']),
+        );
+
+        // Update options
+        update_option('leaflet_map_options', $data);
+
+        // Display success message
+        echo '<div class="updated"><p>Settings saved.</p></div>';
     }
 
-    function my_tab_1_field_callback($post){
-        $value = esc_attr(get_option('my_tab_1_setting'));
-        echo "<input type='text' name='my_tab_1_setting' value='$value' />";
+    function dynamic_leaflet_register_my_settings() {
+        register_setting('dynamic_leaflet_settings_group_tab_1', 'my_tab_1_setting');
+
+
+        /**
+         * Group setting for tab 1
+         */
+        add_settings_section('tab_map_settings', 'Map Settings', '__return_false', 'tabbed-settings-tab-1');
+        add_settings_field(
+            'leaflet_map_center',
+            'Map Center',
+            array($this, 'leaflet_map_center_callback'),
+            'tabbed-settings-tab-1',
+            'tab_map_settings'
+        );
+        
+        add_settings_field(
+            'leaflet_map_zoom',
+            'Default Zoom Level',
+            array($this,'leaflet_map_zoom_callback'),
+            'tabbed-settings-tab-1',
+            'tab_map_settings'
+        );
+        
+        add_settings_field(
+            'leaflet_map_maxzoom',
+            'Max Zoom',
+            array($this,'leaflet_map_maxzoom_callback'),
+            'tabbed-settings-tab-1',
+            'tab_map_settings'
+        );
+
+        add_settings_field(
+            'leaflet_map_dimensions',
+            'Map Size',
+            array($this,'leaflet_map_dimensions_callback'),
+            'tabbed-settings-tab-1',
+            'tab_map_settings'
+        );
+        
+        add_settings_field(
+            'leaflet_map_tile_url',
+            'Tile Layer URL',
+            array($this,'leaflet_map_tile_url_callback'),
+            'tabbed-settings-tab-1',
+            'tab_map_settings'
+        );
+        
+        add_settings_field(
+            'leaflet_map_attribution',
+            'Attribution',
+            array($this,'leaflet_map_attribution_callback'),
+            'tabbed-settings-tab-1',
+            'tab_map_settings'
+        );
     }
-    function my_tab_2_field_callback(){
-        $value = esc_attr(get_option('my_tab_2_setting'));
-        echo "<input type='text' name='my_tab_2_setting' value='$value' />";
+
+    function leaflet_map_center_callback() {
+        $options = get_option('leaflet_map_options');
+        $latitude = isset($options['latitude']) ? esc_attr($options['latitude']) : '';
+        $longitude = isset($options['longitude']) ? esc_attr($options['longitude']) : '';
+        echo '<input type="text" name="leaflet_map_options[latitude]" value="' . $latitude . '" placeholder="Latitude" /> <input type="text" name="leaflet_map_options[longitude]" value="' . $longitude . '" placeholder="Longitude" />';
     }
-    function my_tab_3_field_callback(){
-        $value = esc_attr(get_option('my_tab_3_setting'));
-        echo "<input type='text' name='my_tab_3_setting' value='$value' />";
+
+    function leaflet_map_zoom_callback() {
+        $options = get_option('leaflet_map_options');
+        $zoom = isset($options['zoom']) ? intval($options['zoom']) : 13;
+        echo '<input type="number" name="leaflet_map_options[zoom]" value="' . $zoom . '" min="1" max="18" />';
+    }
+
+    function leaflet_map_tile_url_callback() {
+        $options = get_option('leaflet_map_options');
+        $tile_url = isset($options['tile_url']) ? esc_attr($options['tile_url']) : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        echo '<input type="text" name="leaflet_map_options[tile_url]" value="' . $tile_url . '" size="80" />';
+    }
+
+    function leaflet_map_dimensions_callback() {
+        $options = get_option('leaflet_map_options');
+        $height = isset($options['height']) ? esc_attr($options['height']) : '400px';
+        $width = isset($options['width']) ? esc_attr($options['width']) : '100%';
+        echo '<input type="text" name="leaflet_map_options[height]" value="' . $height . '" placeholder="Height" /> <input type="text" name="leaflet_map_options[width]" value="' . $width . '" placeholder="Width" />';
+    }
+
+    function leaflet_map_attribution_callback() {
+        $options = get_option('leaflet_map_options');
+        $attribution = isset($options['attribution']) ? esc_textarea($options['attribution']) : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+        echo '<textarea name="leaflet_map_options[attribution]" rows="3" cols="80">' . $attribution . '</textarea>';
+    }
+
+    function leaflet_map_maxzoom_callback() {
+        $options = get_option('leaflet_map_options');
+        $maxzoom = isset($options['maxzoom']) ? intval($options['maxzoom']) : 18;
+        echo '<input type="number" name="leaflet_map_options[maxzoom]" value="' . $maxzoom . '" min="1" max="22" />';
     }
 }
 

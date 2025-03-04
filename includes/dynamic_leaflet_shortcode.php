@@ -12,16 +12,17 @@ class DynamicLeafletShortcode{
         add_shortcode( 'dynamic-leaflet-map', [$this,'dynamic_leaflet_map_shortcode'] );
     }
 
+    /**
+     * add style and script for frontend
+     */
     function dynamic_leaflet_enqueue_styles_and_scripts(){
 
-        if (!is_user_logged_in()){
-            // Enqueue Leaflet CSS
-            wp_enqueue_style( 'leaflet-css', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', array(), '1.9.4' );
+        // Enqueue Leaflet CSS
+        wp_enqueue_style( 'leaflet-css', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', array(), '1.9.4' );
 
-            // Enqueue Leaflet JS
-            wp_enqueue_script( 'leaflet-js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', array(), '1.9.4', true );
-            wp_enqueue_script( 'leaflet-custom-js', DYNAMIC_LEAFLET_PLUGIN_URL . 'assets/js/dynamic-leaflet.js', array( 'jquery','leaflet-js' ), DYNAMIC_LEAFLET_PLUGIN_VERSION, true );
-        }
+        // Enqueue Leaflet JS
+        wp_enqueue_script( 'leaflet-js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', array(), '1.9.4', true );
+        wp_enqueue_script( 'leaflet-custom-js', DYNAMIC_LEAFLET_PLUGIN_URL . 'assets/js/dynamic-leaflet.js', array( 'jquery','leaflet-js' ), DYNAMIC_LEAFLET_PLUGIN_VERSION, true );
 
     }
 
