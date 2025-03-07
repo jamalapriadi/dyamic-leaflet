@@ -5,7 +5,7 @@
 
 a simple WordPress plugin for manage data and show it in map using leaflet
 
-![Result Screenshoot](https://imgur.com/a/qJTICxW)
+![Result Screenshot](assets/img/result.png)
 
 ## Installation
 1. **Download the plugin zip file**: Get the plugin's `.zip` file from a trusted source.
