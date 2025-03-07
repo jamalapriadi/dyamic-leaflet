@@ -111,7 +111,11 @@ class DynamicLeafletSettingAdminPage{
             'width' => sanitize_text_field($_POST['leaflet_map_options']['width']),
             'tile_url' => sanitize_text_field($_POST['leaflet_map_options']['tile_url']),
             'attribution' => sanitize_textarea_field($_POST['leaflet_map_options']['attribution']),
-            'maxzoom' => intval($_POST['leaflet_map_options']['maxzoom']),
+            'max_zoom' => intval($_POST['leaflet_map_options']['max_zoom']),
+            'zoom_control'=> sanitize_textarea_field($_POST['leaflet_map_options']['zoom_control']),
+            'scrool_wheel_zoom'=> sanitize_textarea_field($_POST['leaflet_map_options']['scrool_wheel_zoom']),
+            'double_click_zoom'=> sanitize_textarea_field($_POST['leaflet_map_options']['double_click_zoom']),
+            'attribution_control'=> sanitize_textarea_field($_POST['leaflet_map_options']['attribution_control']),
         );
 
         // Update options
@@ -131,7 +135,7 @@ class DynamicLeafletSettingAdminPage{
         add_settings_section('tab_map_settings', 'Map Settings', '__return_false', 'tabbed-settings-tab-1');
         add_settings_field(
             'leaflet_map_center',
-            'Map Center',
+            'Map Center (Lat & Lng)',
             array($this, 'leaflet_map_center_callback'),
             'tabbed-settings-tab-1',
             'tab_map_settings'
@@ -146,16 +150,40 @@ class DynamicLeafletSettingAdminPage{
         );
         
         add_settings_field(
-            'leaflet_map_maxzoom',
+            'leaflet_map_max_zoom',
             'Max Zoom',
-            array($this,'leaflet_map_maxzoom_callback'),
+            array($this,'leaflet_map_max_zoom_callback'),
+            'tabbed-settings-tab-1',
+            'tab_map_settings'
+        );
+
+        add_settings_field(
+            'leaflet_map_zoom_control',
+            'Zoom Control',
+            array($this,'leaflet_map_zoom_control_callback'),
+            'tabbed-settings-tab-1',
+            'tab_map_settings'
+        );
+
+        add_settings_field(
+            'leaflet_map_scrool_wheel_zoom',
+            'Scrool Wheel Zoom',
+            array($this,'leaflet_map_scrool_wheel_zoom_callback'),
+            'tabbed-settings-tab-1',
+            'tab_map_settings'
+        );
+
+        add_settings_field(
+            'leaflet_map_double_click_zoom',
+            'Double Click Zoom',
+            array($this,'leaflet_map_double_click_zoom_callback'),
             'tabbed-settings-tab-1',
             'tab_map_settings'
         );
 
         add_settings_field(
             'leaflet_map_dimensions',
-            'Map Size',
+            'Map Size (Height & Width)',
             array($this,'leaflet_map_dimensions_callback'),
             'tabbed-settings-tab-1',
             'tab_map_settings'
@@ -165,6 +193,14 @@ class DynamicLeafletSettingAdminPage{
             'leaflet_map_tile_url',
             'Tile Layer URL',
             array($this,'leaflet_map_tile_url_callback'),
+            'tabbed-settings-tab-1',
+            'tab_map_settings'
+        );
+
+        add_settings_field(
+            'leaflet_map_attribution_control',
+            'Attribution Control',
+            array($this,'leaflet_map_attribution_control_callback'),
             'tabbed-settings-tab-1',
             'tab_map_settings'
         );
@@ -210,10 +246,46 @@ class DynamicLeafletSettingAdminPage{
         echo '<textarea name="leaflet_map_options[attribution]" rows="3" cols="80">' . $attribution . '</textarea>';
     }
 
-    function leaflet_map_maxzoom_callback() {
+    function leaflet_map_max_zoom_callback() {
         $options = get_option('leaflet_map_options');
-        $maxzoom = isset($options['maxzoom']) ? intval($options['maxzoom']) : 18;
-        echo '<input type="number" name="leaflet_map_options[maxzoom]" value="' . $maxzoom . '" min="1" max="22" />';
+        $max_zoom = isset($options['max_zoom']) ? intval($options['max_zoom']) : 18;
+        echo '<input type="number" name="leaflet_map_options[max_zoom]" value="' . $max_zoom . '" min="1" max="22" />';
+    }
+
+    function leaflet_map_zoom_control_callback() {
+        $options = get_option('leaflet_map_options');
+        $zoom_control = isset($options['zoom_control']) ? esc_attr($options['zoom_control']) : 'yes';
+        echo '<select name="leaflet_map_options[zoom_control]">';
+        echo '<option value="yes" ' . selected('yes', $zoom_control, false) . '>Yes</option>';
+        echo '<option value="no" ' . selected('no', $zoom_control, false) . '>No</option>';
+        echo '</select>';
+    }
+
+    function leaflet_map_scrool_wheel_zoom_callback() {
+        $options = get_option('leaflet_map_options');
+        $scrool_wheel_zoom = isset($options['scrool_wheel_zoom']) ? esc_attr($options['scrool_wheel_zoom']) : 'yes';
+        echo '<select name="leaflet_map_options[scrool_wheel_zoom]">';
+        echo '<option value="yes" ' . selected('yes', $scrool_wheel_zoom, false) . '>Yes</option>';
+        echo '<option value="no" ' . selected('no', $scrool_wheel_zoom, false) . '>No</option>';
+        echo '</select>';
+    }
+
+    function leaflet_map_double_click_zoom_callback() {
+        $options = get_option('leaflet_map_options');
+        $double_click_zoom = isset($options['double_click_zoom']) ? esc_attr($options['double_click_zoom']) : 'yes';
+        echo '<select name="leaflet_map_options[double_click_zoom]">';
+        echo '<option value="yes" ' . selected('yes', $double_click_zoom, false) . '>Yes</option>';
+        echo '<option value="no" ' . selected('no', $double_click_zoom, false) . '>No</option>';
+        echo '</select>';
+    }
+
+    function leaflet_map_attribution_control_callback() {
+        $options = get_option('leaflet_map_options');
+        $attribution_control = isset($options['attribution_control']) ? esc_attr($options['attribution_control']) : 'yes';
+        echo '<select name="leaflet_map_options[attribution_control]">';
+        echo '<option value="yes" ' . selected('yes', $attribution_control, false) . '>Yes</option>';
+        echo '<option value="no" ' . selected('no', $attribution_control, false) . '>No</option>';
+        echo '</select>';
     }
 }
 

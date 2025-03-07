@@ -14,9 +14,9 @@ class DynamicLeafletRegisterPostType{
     function init(){
         add_action('init', array($this, 'dynamic_leaflet_register_post_type'));
         add_action('acf/init', array($this,'dynamic_leaflet_register_acf_fields'));
-        add_filter( 'manage_dynamic-leaflet_posts_columns', array($this,'acf_admin_columns_add_columns') ); // Replace 'post' with your post type
-        add_action( 'manage_dynamic-leaflet_posts_custom_column', array($this,'acf_admin_columns_display_columns'), 10, 2 ); // Replace 'post' with your post type
-        add_filter( 'manage_edit-dynamic-leaflet_sortable_columns', array($this,'acf_admin_columns_sortable_columns') ); // Replace 'post' with your post type
+        add_filter( 'manage_dynamic-leaflet_posts_columns', array($this,'acf_admin_columns_add_columns') ); 
+        add_action( 'manage_dynamic-leaflet_posts_custom_column', array($this,'acf_admin_columns_display_columns'), 10, 2 ); 
+        add_filter( 'manage_edit-dynamic-leaflet_sortable_columns', array($this,'acf_admin_columns_sortable_columns') ); 
         add_action( 'pre_get_posts', array($this,'acf_admin_columns_orderby') );
     }
 
@@ -56,15 +56,16 @@ class DynamicLeafletRegisterPostType{
         $args = array(
             'labels' => $labels,
             'public' => true,
-            'show_in_rest' => false,
+            'show_in_rest' => true,
             'show_ui' => true,
             'show_in_menu' => true,
             'has_archive'=> true,
             'rewrite' => array('slug' => 'dynamic-leaflet'),
-            'support'=>array('title','editor','thumbnail','custom-fields'),
+            'supports'    => array('title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'),
             'capability_type' => 'post',
             'menu_position' => 5,
-            'menu_icon' => 'dashicons-admin-site-alt2'
+            'menu_icon' => 'dashicons-admin-site-alt2',
+            // 'taxonomies'   => array('category'),
         );
     
         register_post_type('dynamic-leaflet', $args);
@@ -107,7 +108,7 @@ class DynamicLeafletRegisterPostType{
             $groups = acf_get_field_groups();
     
             foreach ($groups as $group) {
-                if ($group['key'] === 'dynamic_leaflet_map_information') { // Replace with your group key
+                if ($group['key'] === 'dynamic_leaflet_map_information') { 
                     acf_delete_field_group($group['ID']);
                 }
             }
@@ -115,15 +116,14 @@ class DynamicLeafletRegisterPostType{
     }
 
     function acf_admin_columns_add_columns( $columns ) {
-        // $columns['shortcode'] = __( 'Shortcode', 'shortcode' );
-        $columns['latitude'] = __( 'Latitude', 'latitude' ); // Replace 'my_acf_field' with your ACF field name
-        $columns['longtitude'] = __( 'Longtitude', 'Longtitude' );
+        $columns['latitude'] = __( 'Latitude', 'dyamic-leaflet' ); 
+        $columns['longtitude'] = __( 'Longtitude', 'dyamic-leaflet' );
     
         if (isset($columns['date'])) {
             unset($columns['date']); // Remove the date column
         }
     
-        $columns['date'] = __( 'Date', 'date' );
+        $columns['date'] = __( 'Date', 'dyamic-leaflet' );
     
         return $columns;
     }
