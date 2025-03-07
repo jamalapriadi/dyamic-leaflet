@@ -3,7 +3,7 @@
 ![Leaflet](https://img.shields.io/badge/leaflet-1.9.4-green.svg?style=flat)
 ![WordPress](https://img.shields.io/badge/wordpress-6.7.2-green.svg?style=flat)
 
-a simple plugin WordPress for manage data and show it in map using leaflet
+a simple WordPress plugin for manage data and show it in map using leaflet
 
 ## INSTALLATION
 1. **Download the plugin zip file**: Get the plugin's `.zip` file from a trusted source.
